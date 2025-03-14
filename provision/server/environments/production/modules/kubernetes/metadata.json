@@ -1,0 +1,23 @@
+{
+  "name": "redfield-k8s",
+  "version": "0.1.0",
+  "author": "Ivan Krasnopolsky",
+  "summary": "A Puppet module to manage Kubernetes deployment",
+  "license": "Apache-2.0",
+  "source": "https://github.com/Krasnopolskiy/devops",
+  "dependencies": [],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "Ubuntu",
+      "operatingsystemrelease": [
+        "20.04"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 6.0.0 < 8.0.0"
+    }
+  ]
+}

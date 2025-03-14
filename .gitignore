@@ -1,0 +1,5 @@
+.idea
+.vagrant
+data/
+certs/
+env
