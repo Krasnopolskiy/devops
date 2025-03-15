@@ -1,0 +1,20 @@
+---
+- name: Install and configure Puppet Server
+  hosts: puppet_server
+  become: true
+  gather_facts: true
+
+  vars:
+    certname: "{{ ansible_fqdn }}"
+    server_ip: "{{ ansible_default_ipv4.address }}"
+    common_role_success: false
+
+  pre_tasks:
+    - name: Assert that puppet password is defined
+      ansible.builtin.assert:
+        that: puppet_password is defined
+        msg: "Puppet password is not defined. Please define it by running: export PUPPET_API_KEY=your_password"
+
+  roles:
+    - puppet_common
+    - puppet_server

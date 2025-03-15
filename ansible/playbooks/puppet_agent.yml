@@ -1,0 +1,18 @@
+---
+- name: Install and configure Puppet Agent
+  hosts: puppet_agent
+  become: true
+  gather_facts: true
+
+  vars:
+    certname: "{{ ansible_fqdn }}"
+
+  pre_tasks:
+    - name: Assert that puppet password is defined
+      ansible.builtin.assert:
+        that: puppet_password is defined and puppet_password|length > 0
+        msg: "Puppet password is not defined. Please define it by running: export PUPPET_API_KEY=your_password"
+
+  roles:
+    - puppet_common
+    - puppet_agent

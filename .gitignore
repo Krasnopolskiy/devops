@@ -1,5 +1,7 @@
 .idea
 .vagrant
+.ansible
 data/
 certs/
 env
+config

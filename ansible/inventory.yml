@@ -1,0 +1,15 @@
+---
+puppet_server:
+  hosts:
+    provisioner:
+      ansible_connection: local
+
+puppet_agent:
+  hosts:
+    k8s_master:
+      ansible_connection: local
+
+k8s_workers:
+  hosts:
+    k8s_worker:
+      ansible_connection: local

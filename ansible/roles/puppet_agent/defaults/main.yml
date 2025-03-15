@@ -1,0 +1,4 @@
+---
+puppet_conf_dir: /etc/puppetlabs/puppet
+puppet_runinterval: 1800
+wait_for_cert: 120

@@ -1,0 +1,63 @@
+---
+- name: Check if Puppet Agent is already installed
+  ansible.builtin.command: dpkg-query -W -f='${Status}' puppet-agent
+  register: puppet_agent_status
+  changed_when: false
+  failed_when: false
+
+- name: Add hosts entry for Puppet Server
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ puppet_server_ip }} {{ puppet_server }} # Added by Ansible Puppet Agent installer"
+    regexp: "^{{ puppet_server_ip }}\\s+{{ puppet_server }}"
+  when: puppet_server_ip is defined and puppet_server is defined
+
+- name: Install Puppet Agent
+  ansible.builtin.apt:
+    name: puppet-agent
+    state: present
+  when: puppet_agent_status.stdout != "install ok installed"
+  register: puppet_agent_installed
+
+- name: Create Puppet configuration directory
+  ansible.builtin.file:
+    path: "{{ puppet_conf_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Configure Puppet Agent
+  ansible.builtin.template:
+    src: puppet-agent.conf.j2
+    dest: "{{ puppet_conf_dir }}/puppet.conf"
+    mode: "0644"
+  notify: restart puppet-agent
+
+- name: Run initial Puppet agent in noop mode
+  ansible.builtin.command: "/opt/puppetlabs/bin/puppet agent --test --noop"
+  args:
+    creates: "/etc/puppetlabs/puppet/ssl/certs/{{ certname }}.pem"
+  changed_when: false
+  failed_when: false
+  register: puppet_agent_test
+
+- name: Request certificate signing
+  ansible.builtin.command: "/opt/puppetlabs/bin/puppet agent --test --waitforcert {{ wait_for_cert }}"
+  args:
+    creates: "/etc/puppetlabs/puppet/ssl/certs/{{ certname }}.pem"
+  changed_when: false
+  failed_when: false
+  register: puppet_cert_request
+
+- name: Enable Puppet agent service
+  ansible.builtin.systemd:
+    name: puppet
+    enabled: true
+
+- name: Start Puppet agent service
+  ansible.builtin.systemd:
+    name: puppet
+    state: started
+
+- name: Show Puppet agent status
+  ansible.builtin.debug:
+    msg: "Puppet Agent installed and configured with certificate name: {{ certname }} connecting to server: {{ puppet_server }}"

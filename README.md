@@ -83,7 +83,7 @@ Kubernetes — это система оркестрации контейнеро
 
 ### Задание
 
-В своей работе используйте приложение [Todo](https://github.com/docker/docker-birthday-3/tree/master/app). Все
+В своей работе используйте приложение [Todo](https://github.com/nitwof/devops-todo). Все
 зависимости и инструкции по сборке указаны в README репозитория.
 
 ## Continuous Integration
@@ -106,7 +106,7 @@ Kubernetes — это система оркестрации контейнеро
 Следуйте [официальной документации](https://jenkins.io/doc/)
 
 - Изучите документацию.
-- Разверните Jenkins controller и Jenkins agent при помощи **Docker Compose*- на одной из виртуальных машин.
+- Разверните Jenkins controller и Jenkins agent при помощи **Docker Compose** на одной из виртуальных машин.
 - Настройте Jenkins.
 - Подключите Jenkins к Gogs при помощи [плагина](https://plugins.jenkins.io/gogs-webhook/).
 - Настройте CI pipeline для приложения ориентируясь на [официальную документацию](https://jenkins.io/doc/pipeline/)

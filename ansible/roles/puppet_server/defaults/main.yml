@@ -1,0 +1,4 @@
+---
+java_heap_size: "1g"
+puppet_environment_dir: /etc/puppetlabs/code
+puppet_conf_dir: /etc/puppetlabs/puppet
