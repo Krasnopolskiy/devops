@@ -1,0 +1,11 @@
+---
+- name: Install and configure Puppet Agent
+  hosts: puppet_agent
+  become: true
+  gather_facts: true
+  roles:
+    - common
+    - puppet_agent
+
+  vars:
+    certname: "{{ ansible_fqdn }}"

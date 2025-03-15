@@ -1,0 +1,46 @@
+---
+# Common tasks for both Puppet Server and Agent
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install dependencies
+  apt:
+    name:
+      - wget
+      - curl
+    state: present
+
+- name: Check if Puppet repository is already installed
+  stat:
+    path: "/etc/apt/sources.list.d/puppet{{ puppet_version }}.list"
+  register: puppet_repo
+
+- name: Download Puppet release package
+  get_url:
+    url: "https://apt-puppetcore.puppet.com/public/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
+    dest: "/tmp/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
+  when: not puppet_repo.stat.exists
+
+- name: Install Puppet repository package
+  apt:
+    deb: "/tmp/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
+  when: not puppet_repo.stat.exists
+
+- name: Create apt auth directory
+  file:
+    path: /etc/apt/auth.conf.d
+    state: directory
+    mode: '0755'
+
+- name: Configure Puppet repository authentication
+  template:
+    src: apt-puppetcore-puppet.conf.j2
+    dest: /etc/apt/auth.conf.d/apt-puppetcore-puppet.conf
+    mode: '0600'
+
+- name: Update apt cache after adding repository
+  apt:
+    update_cache: yes

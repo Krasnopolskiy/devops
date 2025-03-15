@@ -1,0 +1,16 @@
+---
+# Tasks for setting up Kubernetes Puppet module
+
+- name: Ensure puppet code directory exists
+  file:
+    path: "{{ puppet_environment_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Synchronize Puppet environments with rsync
+  synchronize:
+    src: environments/
+    dest: "{{ puppet_environment_dir }}/environments/"
+    delete: yes
+    recursive: yes
+  delegate_to: "{{ inventory_hostname }}"

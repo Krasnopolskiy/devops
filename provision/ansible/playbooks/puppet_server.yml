@@ -1,0 +1,13 @@
+---
+- name: Install and configure Puppet Server
+  hosts: puppet_server
+  become: true
+  gather_facts: true
+  roles:
+    - common
+    - puppet_server
+    - kubernetes
+
+  vars:
+    certname: "{{ ansible_fqdn }}"
+    server_ip: "{{ ansible_default_ipv4.address }}"

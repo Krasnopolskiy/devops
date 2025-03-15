@@ -1,0 +1,43 @@
+---
+all:
+  children:
+    puppet:
+      children:
+        puppet_server:
+          hosts:
+            provisioner:
+              ansible_connection: local
+              certname: "{{ certname | default('puppet.' + host_domain) }}"
+              server_ip: "{{ server_ip | default('10.0.10.2') }}"
+        puppet_agent:
+          hosts:
+            k8s_master:
+              ansible_connection: local
+              certname: "{{ certname | default('k8s-master.' + host_domain) }}"
+              puppet_server: "{{ puppet_server | default('puppet.' + host_domain) }}"
+              puppet_server_ip: "{{ puppet_server_ip | default('10.0.10.2') }}"
+            k8s_worker1:
+              ansible_connection: local
+              certname: "{{ certname | default('k8s-worker1.' + host_domain) }}"
+              puppet_server: "{{ puppet_server | default('puppet.' + host_domain) }}"
+              puppet_server_ip: "{{ puppet_server_ip | default('10.0.10.2') }}"
+            k8s_worker2:
+              ansible_connection: local
+              certname: "{{ certname | default('k8s-worker2.' + host_domain) }}"
+              puppet_server: "{{ puppet_server | default('puppet.' + host_domain) }}"
+              puppet_server_ip: "{{ puppet_server_ip | default('10.0.10.2') }}"
+    kubernetes:
+      children:
+        k8s_master:
+          hosts:
+            k8s_master:
+        k8s_workers:
+          hosts:
+            k8s_worker1:
+            k8s_worker2:
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    puppet_password: "{{ puppet_password | default(lookup('env', 'PUPPET_API_KEY')) }}"
+    puppet_version: 8
+    java_heap_size: "{{ java_heap_size | default('2g') }}"
+    host_domain: "redfield.tech"

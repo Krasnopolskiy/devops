@@ -1,0 +1,83 @@
+---
+# Tasks for Puppet Server installation and configuration
+
+- name: Check if Puppet Server is already installed
+  command: dpkg-query -W -f='${Status}' puppetserver
+  register: puppetserver_status
+  changed_when: false
+  failed_when: false
+
+- name: Install Puppet Server
+  apt:
+    name: puppetserver
+    state: present
+  when: puppetserver_status.stdout != "install ok installed"
+  register: puppetserver_installed
+
+- name: Create Puppet configuration directory
+  file:
+    path: "{{ puppet_conf_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Configure Puppet Server
+  template:
+    src: puppet.conf.j2
+    dest: "{{ puppet_conf_dir }}/puppet.conf"
+    mode: '0644'
+  notify: restart puppetserver
+
+- name: Configure Puppet Server routes
+  template:
+    src: routes.yaml.j2
+    dest: "{{ puppet_conf_dir }}/routes.yaml"
+    mode: '0644'
+  notify: restart puppetserver
+
+- name: Set Java heap size
+  lineinfile:
+    path: /etc/default/puppetserver
+    regexp: '^JAVA_ARGS=".*-Xms\w+ -Xmx\w+'
+    line: 'JAVA_ARGS="-Xms{{ java_heap_size }} -Xmx{{ java_heap_size }}'
+    backrefs: yes
+  notify: restart puppetserver
+
+- name: Add hosts entry for Puppet Server
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ server_ip }} {{ certname }} # Added by Ansible Puppet Server installer"
+    regexp: "^{{ server_ip }}\\s+{{ certname }}"
+  when: server_ip is defined and certname is defined
+
+- name: Create Puppet code directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ puppet_environment_dir }}"
+    - "{{ puppet_environment_dir }}/environments"
+    - "{{ puppet_environment_dir }}/environments/production"
+    - "{{ puppet_environment_dir }}/environments/production/manifests"
+    - "{{ puppet_environment_dir }}/environments/production/modules"
+
+- name: Enable Puppet Server service
+  systemd:
+    name: puppetserver
+    enabled: yes
+
+- name: Start Puppet Server service
+  systemd:
+    name: puppetserver
+    state: started
+  register: puppetserver_started
+  ignore_errors: yes
+
+- name: Wait for Puppet Server to start
+  pause:
+    seconds: 10
+  when: puppetserver_started.changed
+
+- name: Show Puppet Server status
+  debug:
+    msg: "Puppet Server installed and running with certificate name: {{ certname }}"

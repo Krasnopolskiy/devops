@@ -1,0 +1,8 @@
+---
+# Handlers for Puppet Server
+
+- name: restart puppetserver
+  systemd:
+    name: puppetserver
+    state: restarted
+    daemon_reload: yes

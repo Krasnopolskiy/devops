@@ -1,0 +1,5 @@
+---
+# Default variables for Kubernetes module
+puppet_environment_dir: /etc/puppetlabs/code
+kubernetes_version: "v1.32"
+crio_version: "v1.32"

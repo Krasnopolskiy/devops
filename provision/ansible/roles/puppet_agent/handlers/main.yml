@@ -1,0 +1,8 @@
+---
+# Handlers for Puppet Agent
+
+- name: restart puppet-agent
+  systemd:
+    name: puppet
+    state: restarted
+    daemon_reload: yes

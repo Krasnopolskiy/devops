@@ -1,0 +1,9 @@
+{
+  "name": "site-kubernetes",
+  "version": "0.1.0",
+  "author": "Ansible",
+  "summary": "Manages Kubernetes clusters",
+  "license": "Apache-2.0",
+  "source": "",
+  "dependencies": []
+}

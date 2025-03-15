@@ -1,0 +1,6 @@
+---
+- name: Include Puppet Server playbook
+  import_playbook: puppet_server.yml
+
+- name: Include Puppet Agent playbook
+  import_playbook: puppet_agent.yml

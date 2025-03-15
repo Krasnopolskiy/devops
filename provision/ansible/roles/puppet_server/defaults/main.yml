@@ -1,0 +1,5 @@
+---
+# Default variables for Puppet Server
+java_heap_size: "2g"
+puppet_environment_dir: /etc/puppetlabs/code
+puppet_conf_dir: /etc/puppetlabs/puppet
