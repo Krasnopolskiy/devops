@@ -30,21 +30,19 @@ def setup_node(node, machine)
   end
 end
 
-def provision_ansible(node, machine, server_ip)
+def provision_ansible(node, machine, server)
   playbook = "#{machine[:role]}.yml"
 
   extra_vars = {
-    "puppet_password" => ENV['PUPPET_API_KEY']
+    "puppet_password" => ENV['PUPPET_API_KEY'],
+    "server_ip" => server[:ip],
+    "certname" => "#{machine[:hostname]}.#{$host}"
   }
 
   if machine[:role] == "puppet_server"
-    extra_vars["certname"] = "puppet.#{$host}"
-    extra_vars["server_ip"] = machine[:ip]
     extra_vars["java_heap_size"] = "1g"
   else
-    extra_vars["certname"] = "#{machine[:hostname]}.#{$host}"
-    extra_vars["puppet_server"] = "puppet.#{$host}"
-    extra_vars["puppet_server_ip"] = server_ip
+    extra_vars["server_certname"] = "#{server[:hostname]}.#{$host}"
   end
 
   node.vm.provision "ansible_local" do |ansible|
@@ -63,7 +61,7 @@ Vagrant.configure("2") do |config|
   machines.each do |name, machine|
     config.vm.define machine[:hostname] do |node|
       setup_node(node, machine)
-      provision_ansible(node, machine, machines[:provisioner][:ip])
+      provision_ansible(node, machine, machines[:provisioner])
     end
   end
 end

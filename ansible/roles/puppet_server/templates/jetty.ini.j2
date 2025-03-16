@@ -1,0 +1,7 @@
+[jetty]
+ssl-host = {{ puppetdb.listen.address }}
+ssl-port = {{ puppetdb.listen.port }}
+
+ssl-key = /etc/puppetlabs/puppetdb/ssl/private.pem
+ssl-cert = /etc/puppetlabs/puppetdb/ssl/public.pem
+ssl-ca-cert = /etc/puppetlabs/puppetdb/ssl/ca.pem

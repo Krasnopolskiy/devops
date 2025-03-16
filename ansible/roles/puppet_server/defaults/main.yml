@@ -1,4 +1,17 @@
 ---
 java_heap_size: "1g"
-puppet_environment_dir: /etc/puppetlabs/code
-puppet_conf_dir: /etc/puppetlabs/puppet
+
+puppet:
+  environment_dir: /etc/puppetlabs/code
+  conf_dir: /etc/puppetlabs/puppet
+
+puppetdb:
+  db:
+    user: puppetdb
+    password: puppetdb
+    name: puppetdb
+    max_connections: 60
+    connection_timeout: 3600
+  listen:
+    address: "0.0.0.0"
+    port: 8081

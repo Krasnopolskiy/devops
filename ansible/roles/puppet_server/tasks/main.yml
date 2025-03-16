@@ -6,29 +6,28 @@
 
 - name: Create Puppet configuration directory
   ansible.builtin.file:
-    path: "{{ puppet_conf_dir }}"
+    path: "{{ puppet.conf_dir }}"
     state: directory
     mode: "0755"
 
 - name: Configure Puppet Server
   ansible.builtin.template:
     src: puppet.conf.j2
-    dest: "{{ puppet_conf_dir }}/puppet.conf"
+    dest: "{{ puppet.conf_dir }}/puppet.conf"
     mode: "0644"
-  notify: restart puppetserver
 
 - name: Update Java heap size preserving other settings
   ansible.builtin.lineinfile:
     path: /etc/default/puppetserver
     regexp: '^(JAVA_ARGS=".*)-Xms\w+(\s+)-Xmx\w+(.*")'
-    line: "\1-Xms{{ java_heap_size }}\2-Xmx{{ java_heap_size }}\3"
+    line: "\\1-Xms{{ java_heap_size }}\\2-Xmx{{ java_heap_size }}\\3"
     backrefs: true
     backup: true
 
 - name: Assert that server IP and certname are defined
   ansible.builtin.assert:
     that: server_ip is defined and certname is defined
-    msg: "Server IP or certname are not defined"
+    msg: "Server IP or certname is not defined"
 
 - name: Add hosts entry for Puppet Server
   ansible.builtin.lineinfile:
@@ -50,16 +49,19 @@
   ansible.builtin.debug:
     msg: "Puppet Server installed and running with certificate name: {{ certname }}"
 
+- name: Include PuppetDB installation tasks
+  ansible.builtin.import_tasks: puppetdb.yml
+
 - name: Ensure puppet code directory exists
   ansible.builtin.file:
-    path: "{{ puppet_environment_dir }}"
+    path: "{{ puppet.environment_dir }}"
     state: directory
     mode: "0755"
 
 - name: Synchronize Puppet environments with rsync
   ansible.posix.synchronize:
     src: environments/
-    dest: "{{ puppet_environment_dir }}/environments/"
+    dest: "{{ puppet.environment_dir }}/environments/"
     delete: true
     recursive: true
   delegate_to: "{{ inventory_hostname }}"

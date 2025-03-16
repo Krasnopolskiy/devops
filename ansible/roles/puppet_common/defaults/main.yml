@@ -1,4 +1,3 @@
 ---
 puppet_version: 8
-puppet_password: ""
 ubuntu_release: "{{ ansible_distribution_release }}"

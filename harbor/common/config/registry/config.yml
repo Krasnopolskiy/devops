@@ -1,3 +1,4 @@
+---
 version: 0.1
 log:
   level: info
@@ -21,7 +22,7 @@ redis:
   readtimeout: 10s
   writetimeout: 10s
   dialtimeout: 10s
-  password: 
+  password:
   db: 1
   pool:
     maxidle: 100

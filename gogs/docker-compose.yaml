@@ -1,3 +1,4 @@
+---
 services:
   gogs:
     image: gogs/gogs:0.13-arm64

@@ -1,6 +1,0 @@
----
-- name: Restart puppetserver
-  ansible.builtin.systemd:
-    name: puppetserver
-    state: restarted
-    daemon_reload: true

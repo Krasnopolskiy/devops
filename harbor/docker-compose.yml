@@ -1,3 +1,4 @@
+---
 services:
   log:
     image: goharbor/harbor-log:v2.12.2
@@ -104,7 +105,7 @@ services:
       options:
         syslog-address: "tcp://localhost:1514"
         tag: "postgresql"
-    shm_size: '1gb'
+    shm_size: "1gb"
   core:
     image: goharbor/harbor-core:v2.12.2
     container_name: harbor-core
