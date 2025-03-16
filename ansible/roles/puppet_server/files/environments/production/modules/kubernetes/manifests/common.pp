@@ -7,32 +7,21 @@ class kubernetes::common (
     onlyif  => '/usr/bin/test "$(swapon -s | wc -l)" -gt 1',
   }
 
-  ['overlay', 'br_netfilter'].each |String $module| {
-    exec { "load-${module}":
-      command => "/sbin/modprobe ${module}",
-      unless  => "/bin/lsmod | /bin/grep -q ${module}",
-    }
-
-    file { "/etc/modules-load.d/${module}.conf":
-      ensure  => file,
-      content => "${module}\n",
-      mode    => '0644',
-    }
+  kubernetes::load_kernel_module { 'load-overlay':
+    kernel_module => 'overlay',
   }
 
-  file { '/etc/sysctl.d/k8s.conf':
-    ensure  => file,
-    mode    => '0644',
-    content => "net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-",
+  kubernetes::load_kernel_module { 'load-br-netfilter':
+    kernel_module => 'br_netfilter',
   }
 
-  exec { 'apply-sysctl-settings':
-    command     => '/sbin/sysctl --system',
-    refreshonly => true,
-    subscribe   => File['/etc/sysctl.d/k8s.conf'],
+  kubernetes::sysctl_config { 'kubernetes-network-settings':
+    filename => 'k8s.conf',
+    settings => {
+      'net.bridge.bridge-nf-call-ip6tables' => 1,
+      'net.bridge.bridge-nf-call-iptables'  => 1,
+      'net.ipv4.ip_forward'                 => 1,
+    },
   }
 
   package { ['software-properties-common', 'curl', 'iptables']:
@@ -44,30 +33,14 @@ net.ipv4.ip_forward = 1
     mode   => '0755',
   }
 
-  exec { 'download-kubernetes-key':
-    command => "curl -fsSL https://pkgs.k8s.io/core:/stable:/${kubernetes_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg",
-    path    => ['/usr/bin', '/bin'],
-    creates => '/etc/apt/keyrings/kubernetes-apt-keyring.gpg',
-    require => File['/etc/apt/keyrings'],
+  kubernetes::add_repository { 'add-kubernetes-package':
+    repo_name => 'kubernetes',
+    repo_url  => "https://pkgs.k8s.io/core:/stable:/${kubernetes_version}/deb/",
   }
 
-  file { '/etc/apt/sources.list.d/kubernetes.list':
-    ensure  => file,
-    content => "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${kubernetes_version}/deb/ /",
-    require => Exec['download-kubernetes-key'],
-  }
-
-  exec { 'download-crio-key':
-    command => "curl -fsSL https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${crio_version}/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg",
-    path    => ['/usr/bin', '/bin'],
-    creates => '/etc/apt/keyrings/cri-o-apt-keyring.gpg',
-    require => File['/etc/apt/keyrings'],
-  }
-
-  file { '/etc/apt/sources.list.d/cri-o.list':
-    ensure  => file,
-    content => "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${crio_version}/deb/ /",
-    require => Exec['download-crio-key'],
+  kubernetes::add_repository { 'add-cri-o-package':
+    repo_name => 'cri-o',
+    repo_url  => "https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${crio_version}/deb/",
   }
 
   exec { 'apt-update':

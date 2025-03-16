@@ -8,9 +8,8 @@ class kubernetes (
     crio_version       => $crio_version,
   }
 
-  if $node_role == 'master' {
-    class { 'kubernetes::master': }
-  } elsif $node_role == 'worker' {
-    class { 'kubernetes::worker': }
+  case $node_role {
+    'master': { include kubernetes::master }
+    'worker': { include kubernetes::worker }
   }
 }

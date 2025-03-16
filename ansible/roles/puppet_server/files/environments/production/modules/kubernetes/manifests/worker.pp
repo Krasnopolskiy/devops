@@ -1,5 +1,15 @@
 class kubernetes::worker {
-  notify { 'kubernetes-worker-ready':
-    message => "sudo kubeadm join 10.0.10.3:6443 --token abc123... --discovery-token-ca-cert-hash sha256:def456...\n"
+  file { '/tmp/k8s_join_command.txt.sh':
+    ensure  => present,
+    content => $facts['k8s_join_command'],
+    mode    => '0700',
+  }
+
+  exec { 'join-kubernetes-cluster':
+    command   => '/bin/bash /tmp/k8s_join_command.txt.sh',
+    path      => ['/usr/bin', '/usr/sbin', '/bin'],
+    creates   => '/etc/kubernetes/kubelet.conf',
+    require   => File['/tmp/k8s_join_command.txt.sh'],
+    logoutput => true,
   }
 }

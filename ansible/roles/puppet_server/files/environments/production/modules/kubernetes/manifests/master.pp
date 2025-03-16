@@ -7,7 +7,7 @@ class kubernetes::master {
     require => [
       Service['crio'],
       Exec['swapoff'],
-      Exec['load-br_netfilter'],
+      Exec['load-br-netfilter'],
       Exec['enable-ip-forward'],
     ],
     logoutput => true,
@@ -25,30 +25,25 @@ class kubernetes::master {
     mode    => '0600',
   }
 
-  exec { 'setup-kubeconfig-for-user':
-    command     => 'mkdir -p $HOME/.kube && sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config && sudo chown $(id -u):$(id -g) $HOME/.kube/config',
-    path        => ['/usr/bin', '/usr/sbin', '/bin'],
-    environment => ['HOME=/home/vagrant'],
-    require     => File['/root/.kube/config'],
-    creates     => '/home/vagrant/.kube/config',
-    logoutput   => true,
-  }
-
-  file { '/opt/kubernetes':
-    ensure  => directory,
-    require => Exec['kubeadm-init'],
-  }
-
-  file { '/opt/kubernetes/manifests':
-    ensure  => directory,
-    require => File['/opt/kubernetes'],
-  }
-
   exec { 'deploy-flannel':
     command => 'kubectl apply -f https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml',
     path    => ['/usr/bin', '/bin'],
-    require => Exec['setup-kubeconfig-for-user'],
+    require => File['/root/.kube/config'],
     unless  => 'kubectl get daemonset -n kube-flannel | grep -q flannel',
     logoutput => true,
+  }
+
+  file { '/etc/puppetlabs/facter/facts.d':
+    ensure => directory,
+    owner  => 'root',
+    group  => 'root',
+    mode   => '0755',
+  }
+
+  exec { 'export-join-token':
+    command     => 'kubeadm token create --print-join-command > /etc/puppetlabs/facter/facts.d/k8s_join_command.txt',
+    path        => ['/usr/bin', '/usr/sbin', '/bin'],
+    require     => [File['/etc/puppetlabs/facter/facts.d'], Exec['kubeadm-init']],
+    creates     => '/etc/puppetlabs/facter/facts.d/k8s_join_command.txt',
   }
 }
