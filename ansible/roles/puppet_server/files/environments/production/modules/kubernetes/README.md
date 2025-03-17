@@ -5,7 +5,7 @@ This module manages Kubernetes master and worker nodes.
 ## Usage
 
 ```puppet
-class { 'kubernetes': 
+class { 'kubernetes':
   node_role => 'master', # or 'worker'
 }
 ```

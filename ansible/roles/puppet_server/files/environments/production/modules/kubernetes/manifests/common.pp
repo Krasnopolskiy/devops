@@ -11,7 +11,7 @@ class kubernetes::common (
     kernel_module => 'overlay',
   }
 
-  kubernetes::load_kernel_module { 'load-br-netfilter':
+  kubernetes::load_kernel_module { 'load-br_netfilter':
     kernel_module => 'br_netfilter',
   }
 
@@ -45,7 +45,7 @@ class kubernetes::common (
 
   exec { 'apt-update':
     command     => 'apt-get update',
-    path        => ['/usr/bin', '/bin'],
+    path        => ['/usr/bin'],
     refreshonly => true,
     subscribe   => [
       File['/etc/apt/sources.list.d/kubernetes.list'],
@@ -66,7 +66,7 @@ class kubernetes::common (
 
   exec { 'enable-ip-forward':
     command => 'sysctl -w net.ipv4.ip_forward=1',
-    path    => ['/usr/sbin', '/sbin', '/usr/bin', '/bin'],
+    path    => ['/usr/sbin', '/usr/bin'],
     unless  => 'sysctl net.ipv4.ip_forward | grep -q "net.ipv4.ip_forward = 1"',
   }
 }

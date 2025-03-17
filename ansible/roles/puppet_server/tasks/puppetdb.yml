@@ -49,7 +49,7 @@
     dest: /etc/puppetlabs/puppetdb/conf.d/database.ini
     owner: puppetdb
     group: puppetdb
-    mode: "0640"
+    mode: "0644"
 
 - name: Configure jetty.ini
   ansible.builtin.template:
@@ -57,7 +57,7 @@
     dest: /etc/puppetlabs/puppetdb/conf.d/jetty.ini
     owner: puppetdb
     group: puppetdb
-    mode: "0640"
+    mode: "0644"
 
 - name: Configure PuppetDB connection for Puppet Server
   ansible.builtin.template:
@@ -65,7 +65,7 @@
     dest: "{{ puppet.conf_dir }}/puppetdb.conf"
     owner: puppetdb
     group: puppetdb
-    mode: "0640"
+    mode: "0644"
 
 - name: Configure routes.yaml for PuppetDB
   ansible.builtin.template:
@@ -73,11 +73,10 @@
     dest: "{{ puppet.conf_dir }}/routes.yaml"
     owner: puppetdb
     group: puppetdb
-    mode: "0640"
+    mode: "0644"
+
+- name: Issue PuppetDB certs
+  ansible.builtin.command: "/opt/puppetlabs/bin/puppetdb ssl-setup -f"
 
 - name: Start PuppetDB service
   ansible.builtin.command: "/opt/puppetlabs/bin/puppet resource service puppetdb ensure=running enable=true"
-
-- name: Show PuppetDB status
-  ansible.builtin.debug:
-    msg: "PuppetDB installed and running at https://{{ certname }}:8081"

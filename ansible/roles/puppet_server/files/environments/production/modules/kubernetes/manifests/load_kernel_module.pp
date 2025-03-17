@@ -1,6 +1,3 @@
-# @summary Loads a kernel module and ensures it is loaded at boot
-#
-# @param kernel_module The name of the kernel module to load
 define kubernetes::load_kernel_module(
   String $kernel_module,
 ) {
@@ -14,4 +11,4 @@ define kubernetes::load_kernel_module(
     content => "${kernel_module}\n",
     mode    => '0644',
   }
-} 
+}
