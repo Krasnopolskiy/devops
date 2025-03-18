@@ -2,7 +2,7 @@ class kubernetes::worker {
   $query_result = puppetdb_query("facts { name = 'k8s_join_command' and certname = 'k8s-master.redfield.tech' }")
 
   $join_command = empty($query_result) ? {
-    true    => 'No join command available yet. Run puppet again later.',
+    true    => 'echo No join command available yet. Run puppet again later.',
     default => $query_result[0]['value'],
   }
 
