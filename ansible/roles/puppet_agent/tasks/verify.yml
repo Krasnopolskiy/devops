@@ -1,0 +1,15 @@
+---
+# Verification tasks for puppet_agent role
+
+- name: Assert that server IP and server certname are defined
+  ansible.builtin.assert:
+    that: server_ip is defined and server_certname is defined
+    msg: "Server IP or server certname is not defined"
+  tags: [ "verify", "puppet_agent" ]
+
+- name: Add hosts entry for Puppet Server
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ server_ip }} {{ server_certname }} # Added by Ansible Puppet Agent installer"
+    regexp: "^{{ server_ip }}\\s+{{ server_certname }}"
+  tags: [ "verify", "puppet_agent" ]

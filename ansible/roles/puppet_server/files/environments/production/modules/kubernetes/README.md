@@ -85,6 +85,7 @@ class { 'kubernetes':
 ## Limitations
 
 This module currently only supports:
+
 * Ubuntu-based systems
 * CRI-O as the container runtime
 * Flannel as the CNI plugin

@@ -30,7 +30,9 @@ class kubernetes::setup::dashboard {
   }
 
   exec { 'install-dashboard':
-    command   => 'helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard',
+    command   =>
+      'helm upgrade --install kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard --create-namespace --namespace kubernetes-dashboard'
+    ,
     path      => ['/usr/local/bin', '/usr/bin'],
     unless    => 'helm list -n kubernetes-dashboard | grep kubernetes-dashboard',
     require   => Exec['add-dashboard-repo'],

@@ -1,3 +1,8 @@
 ---
-puppet_version: 8
-ubuntu_release: "{{ ansible_distribution_release }}"
+# Default variables for puppet_common role
+
+# Puppet version to install
+puppet_common_version: 8
+
+# Ubuntu release codename (focal = 20.04, jammy = 22.04)
+puppet_common_ubuntu_release: "{{ ansible_distribution_release }}"

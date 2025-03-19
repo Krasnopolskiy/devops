@@ -1,6 +1,6 @@
 # @summary Ensures kernel modules are loaded and configured to load on boot
 # @param kernel_module Name of the kernel module to load
-define kubernetes::config::kernel_module(
+define kubernetes::config::kernel_module (
   String $kernel_module,
 ) {
   exec { "load-${kernel_module}":

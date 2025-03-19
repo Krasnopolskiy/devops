@@ -1,9 +1,9 @@
 [database]
 classname = org.postgresql.Driver
 subprotocol = postgresql
-subname = //localhost:5432/{{ puppetdb.db.name }}
-username = {{ puppetdb.db.user }}
-password = {{ puppetdb.db.password }}
+subname = //localhost:5432/{{ puppet_server_db.name }}
+username = {{ puppet_server_db.user }}
+password = {{ puppet_server_db.password }}
 node-ttl = 7d
 node-purge-ttl = 14d
 report-ttl = 14d
@@ -11,5 +11,5 @@ report-ttl = 14d
 conn-max-age = 180
 conn-lifetime = 0
 conn-keep-alive = 180
-connection-timeout = {{ puppetdb.db.connection_timeout }}
-max-connections = {{ puppetdb.db.max_connections }}
+connection-timeout = {{ puppet_server_db.connection_timeout }}
+max-connections = {{ puppet_server_db.max_connections }}

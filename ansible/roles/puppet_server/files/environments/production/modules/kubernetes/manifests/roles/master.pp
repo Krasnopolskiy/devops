@@ -4,7 +4,7 @@ class kubernetes::roles::master (
   String $pod_network_cidr = $kubernetes::pod_network_cidr,
 ) {
   include kubernetes::setup::dashboard
-  
+
   exec { 'kubeadm-init':
     command   => "kubeadm init --v=5 --pod-network-cidr=${pod_network_cidr}",
     timeout   => 1200,
@@ -67,10 +67,10 @@ class kubernetes::roles::master (
   }
 
   exec { 'create_join_command_fact':
-    command     => "kubeadm token create --print-join-command > /etc/facter/facts.d/k8s_join_command_output.txt && echo k8s_join_command=$(cat /etc/facter/facts.d/k8s_join_command_output.txt) > /etc/facter/facts.d/k8s_join_command.txt && rm /etc/facter/facts.d/k8s_join_command_output.txt",
-    path        => ['/usr/bin', '/bin'],
-    creates     => '/etc/facter/facts.d/k8s_join_command.txt',
-    require     => [File['/etc/facter/facts.d'], Exec['kubeadm-init']],
-    logoutput   => true,
+    command   => "echo k8s_join_command=$(kubeadm token create --print-join-command) > /etc/facter/facts.d/k8s_join_command.txt",
+    path      => ['/usr/bin', '/bin'],
+    creates   => '/etc/facter/facts.d/k8s_join_command.txt',
+    require   => [File['/etc/facter/facts.d'], Exec['kubeadm-init']],
+    logoutput => true,
   }
 }

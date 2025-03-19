@@ -1,0 +1,21 @@
+---
+galaxy_info:
+  role_name: puppet_common
+  author: Krasnopolsky
+  description: Common tasks for Puppet installation on Ubuntu
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+  galaxy_tags:
+    - puppet
+    - repository
+    - common
+    - configuration
+    - management
+
+dependencies: [ ]

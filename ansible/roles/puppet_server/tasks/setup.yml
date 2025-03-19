@@ -1,0 +1,28 @@
+---
+# Setup tasks for Puppet Server role
+
+- name: Install Puppet Server
+  ansible.builtin.apt:
+    name: puppetserver
+    state: present
+  tags: [ "install", "puppet_server" ]
+
+- name: Create Puppet configuration directory
+  ansible.builtin.file:
+    path: "{{ puppet_server_conf_dir }}"
+    state: directory
+    mode: "0755"
+  tags: [ "install", "puppet_server" ]
+
+- name: Assert that server IP and certname are defined
+  ansible.builtin.assert:
+    that: server_ip is defined and certname is defined
+    msg: "Server IP or certname is not defined"
+  tags: [ "install", "puppet_server" ]
+
+- name: Add hosts entry for Puppet Server
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ server_ip }} {{ certname }} # Added by Ansible Puppet Server installer"
+    regexp: "^{{ server_ip }}\\s+{{ certname }}"
+  tags: [ "install", "puppet_server" ]

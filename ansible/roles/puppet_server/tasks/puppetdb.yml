@@ -1,4 +1,6 @@
 ---
+# PuppetDB installation and configuration tasks
+
 - name: Install PostgreSQL
   ansible.builtin.apt:
     name:
@@ -6,42 +8,53 @@
       - postgresql-contrib
       - python3-pip
     state: present
+  tags: [ "puppetdb", "database" ]
 
 - name: Install psycopg2
   ansible.builtin.pip:
     name: psycopg2-binary
+  tags: [ "puppetdb", "database" ]
 
 - name: Install PuppetDB
   ansible.builtin.command: "/opt/puppetlabs/bin/puppet resource package puppetdb ensure=latest"
+  register: puppet_server_db_install
+  changed_when: "'ensure latest' in puppet_server_db_install.stdout"
+  tags: [ "puppetdb", "install" ]
 
 - name: Install PuppetDB Termini
   ansible.builtin.command: "/opt/puppetlabs/bin/puppet resource package puppetdb-termini ensure=latest"
+  register: puppetdb_termini_install
+  changed_when: "'ensure latest' in puppetdb_termini_install.stdout"
+  tags: [ "puppetdb", "install" ]
 
 - name: Create PuppetDB PostgreSQL user
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
-    name: "{{ puppetdb.db.user }}"
-    password: "{{ puppetdb.db.password }}"
+    name: "{{ puppet_server_db.user }}"
+    password: "{{ puppet_server_db.password }}"
     role_attr_flags: CREATEDB,LOGIN
+  tags: [ "puppetdb", "database" ]
 
 - name: Create PuppetDB database
   become: true
   become_user: postgres
   community.postgresql.postgresql_db:
-    name: "{{ puppetdb.db.name }}"
-    owner: "{{ puppetdb.db.user }}"
+    name: "{{ puppet_server_db.name }}"
+    owner: "{{ puppet_server_db.user }}"
     encoding: UTF8
     lc_collate: en_US.UTF-8
     lc_ctype: en_US.UTF-8
     template: template0
+  tags: [ "puppetdb", "database" ]
 
 - name: Install pg_trgm extension in PuppetDB database
   become: true
   become_user: postgres
   community.postgresql.postgresql_ext:
     name: pg_trgm
-    db: "{{ puppetdb.db.name }}"
+    db: "{{ puppet_server_db.name }}"
+  tags: [ "puppetdb", "database" ]
 
 - name: Configure database.ini
   ansible.builtin.template:
@@ -50,6 +63,8 @@
     owner: puppetdb
     group: puppetdb
     mode: "0644"
+  notify: "restart puppetdb"
+  tags: [ "puppetdb", "config" ]
 
 - name: Configure jetty.ini
   ansible.builtin.template:
@@ -58,25 +73,29 @@
     owner: puppetdb
     group: puppetdb
     mode: "0644"
+  notify: "restart puppetdb"
+  tags: [ "puppetdb", "config" ]
 
 - name: Configure PuppetDB connection for Puppet Server
   ansible.builtin.template:
     src: puppetdb.conf.j2
-    dest: "{{ puppet.conf_dir }}/puppetdb.conf"
+    dest: "{{ puppet_server_conf_dir }}/puppetdb.conf"
     owner: puppetdb
     group: puppetdb
     mode: "0644"
-
-- name: Configure routes.yaml for PuppetDB
-  ansible.builtin.template:
-    src: routes.yaml.j2
-    dest: "{{ puppet.conf_dir }}/routes.yaml"
-    owner: puppetdb
-    group: puppetdb
-    mode: "0644"
+  notify: "restart puppet server"
+  tags: [ "puppetdb", "config" ]
 
 - name: Issue PuppetDB certs
   ansible.builtin.command: "/opt/puppetlabs/bin/puppetdb ssl-setup -f"
+  register: puppetdb_certs
+  changed_when: puppetdb_certs.rc == 0
+  failed_when: puppetdb_certs.rc != 0 and "already exists" not in puppetdb_certs.stderr
+  tags: [ "puppetdb", "config" ]
 
 - name: Start PuppetDB service
-  ansible.builtin.command: "/opt/puppetlabs/bin/puppet resource service puppetdb ensure=running enable=true"
+  ansible.builtin.systemd:
+    name: puppetdb
+    state: started
+    enabled: true
+  tags: [ "puppetdb", "service" ]

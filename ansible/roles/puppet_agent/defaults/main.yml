@@ -1,4 +1,14 @@
 ---
-puppet_conf_dir: /etc/puppetlabs/puppet
-puppet_runinterval: 1m
-wait_for_cert: 1m
+# Default variables for puppet_agent role
+
+# Directory for puppet configuration files
+puppet_agent_conf_dir: /etc/puppetlabs/puppet
+
+# Time to wait for certificate signing from Puppet Server
+puppet_agent_wait_for_cert: 120s
+
+# Run interval for Puppet agent
+puppet_agent_run_interval: 1m
+
+# Environment to use (production, development, testing, etc.)
+puppet_agent_environment: production

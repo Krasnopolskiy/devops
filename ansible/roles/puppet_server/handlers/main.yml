@@ -1,0 +1,14 @@
+---
+# Handlers for puppet_server role
+
+- name: Restart Puppet Server
+  ansible.builtin.systemd:
+    name: puppetserver
+    state: restarted
+  listen: "restart puppet server"
+
+- name: Restart PuppetDB
+  ansible.builtin.systemd:
+    name: puppetdb
+    state: restarted
+  listen: "restart puppetdb"

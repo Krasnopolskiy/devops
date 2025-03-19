@@ -1,0 +1,8 @@
+---
+# Handlers for puppet_agent role
+
+- name: Restart Puppet Agent
+  ansible.builtin.systemd:
+    name: puppet
+    state: restarted
+  listen: "restart puppet agent"

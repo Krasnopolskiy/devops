@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 package-mode = false
 authors = [
-    {name = "Ivan Krasnopolsky",email = "i1.krasnopolskiy@gmail.com"}
+    { name = "Ivan Krasnopolsky", email = "i1.krasnopolskiy@gmail.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"

@@ -1,7 +1,7 @@
 # @summary Configures system control (sysctl) parameters
 # @param filename Name of the sysctl configuration file to create
 # @param settings Hash of sysctl settings to configure
-define kubernetes::config::sysctl(
+define kubernetes::config::sysctl (
   String $filename,
   Hash $settings,
 ) {

@@ -1,7 +1,7 @@
 # @summary Configures a Kubernetes worker node
 # @api private
 class kubernetes::roles::worker {
-  $query_result = puppetdb_query("facts { name = 'k8s_join_command' and certname = 'k8s-master.redfield.tech' }")
+  $query_result = puppetdb_query("facts { name = 'k8s_join_command' }")
 
   $join_command = empty($query_result) ? {
     true    => 'echo No join command available yet. Run puppet again later.',

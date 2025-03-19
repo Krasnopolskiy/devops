@@ -1,0 +1,18 @@
+---
+# Common installation tasks for puppet_common role
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags: [ "install", "puppet_common" ]
+
+- name: Install dependencies
+  ansible.builtin.apt:
+    name:
+      - wget
+      - curl
+      - apt-transport-https
+      - ca-certificates
+    state: present
+  tags: [ "install", "puppet_common" ]

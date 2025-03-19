@@ -1,6 +1,7 @@
 [main]
 certname = {{ certname }}
 server = {{ server_certname }}
+environment = {{ puppet_agent_environment }}
 
 [agent]
-runinterval = {{ puppet_runinterval }}
+runinterval = {{ puppet_agent_run_interval }}

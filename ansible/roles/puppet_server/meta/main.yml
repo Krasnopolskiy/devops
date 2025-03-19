@@ -1,0 +1,22 @@
+---
+galaxy_info:
+  role_name: puppet_server
+  author: Krasnopolsky
+  description: Installs and configures Puppet Server with PuppetDB
+  license: MIT
+  min_ansible_version: "2.9"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+  galaxy_tags:
+    - puppet
+    - puppetserver
+    - puppetdb
+    - configuration
+    - management
+
+dependencies:
+  - role: puppet_common

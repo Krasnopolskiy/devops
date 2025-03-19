@@ -1,0 +1,20 @@
+---
+# Configuration tasks for Puppet Server role
+
+- name: Configure Puppet Server
+  ansible.builtin.template:
+    src: puppet.conf.j2
+    dest: "{{ puppet_server_conf_dir }}/puppet.conf"
+    mode: "0644"
+  notify: Restart Puppet Server
+  tags: [ "config", "puppet_server" ]
+
+- name: Update Java heap size preserving other settings
+  ansible.builtin.lineinfile:
+    path: /etc/default/puppetserver
+    regexp: '^(JAVA_ARGS=".*)-Xms\w+(\s+)-Xmx\w+(.*")'
+    line: "\\1-Xms{{ puppet_server_java_heap_size }}\\2-Xmx{{ puppet_server_java_heap_size }}\\3"
+    backrefs: true
+    backup: true
+  notify: Restart Puppet Server
+  tags: [ "config", "puppet_server" ]

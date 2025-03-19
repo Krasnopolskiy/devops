@@ -1,0 +1,15 @@
+---
+# Installation tasks for puppet_agent role
+
+- name: Install Puppet Agent
+  ansible.builtin.apt:
+    name: puppet-agent
+    state: present
+  tags: [ "install", "puppet_agent" ]
+
+- name: Create Puppet configuration directory
+  ansible.builtin.file:
+    path: "{{ puppet_agent_conf_dir }}"
+    state: directory
+    mode: "0755"
+  tags: [ "install", "puppet_agent" ]

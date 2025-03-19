@@ -1,38 +1,10 @@
 ---
-- name: Configure Puppet repository authentication
-  ansible.builtin.template:
-    src: apt-puppetcore-puppet.conf.j2
-    dest: /etc/apt/auth.conf.d/apt-puppetcore-puppet.conf
-    mode: "0600"
+# Main tasks file for puppet_common role
 
-- name: Update apt cache
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 3600
+- name: Import common installation tasks
+  ansible.builtin.import_tasks: install.yml
+  tags: [ "install", "puppet_common" ]
 
-- name: Install dependencies
-  ansible.builtin.apt:
-    name:
-      - wget
-      - curl
-    state: present
-
-- name: Download Puppet release package
-  ansible.builtin.get_url:
-    url: "https://apt-puppetcore.puppet.com/public/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
-    dest: "/tmp/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
-
-- name: Install Puppet repository package
-  ansible.builtin.apt:
-    deb: "/tmp/puppet{{ puppet_version }}-release-{{ ubuntu_release }}.deb"
-
-- name: Create apt auth directory
-  ansible.builtin.file:
-    path: /etc/apt/auth.conf.d
-    state: directory
-    mode: "0755"
-
-- name: Update apt cache after adding repository
-  ansible.builtin.apt:
-    update_cache: true
-    cache_valid_time: 3600
+- name: Import repository setup tasks
+  ansible.builtin.import_tasks: repository.yml
+  tags: [ "repository", "puppet_common" ]

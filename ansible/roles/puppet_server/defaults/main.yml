@@ -1,17 +1,32 @@
 ---
-java_heap_size: "1g"
+# Default variables for puppet_server role
 
-puppet:
-  environment_dir: /etc/puppetlabs/code
-  conf_dir: /etc/puppetlabs/puppet
+# Java heap size for Puppet Server
+puppet_server_java_heap_size: "1g"
 
-puppetdb:
-  db:
-    user: puppetdb
-    password: puppetdb
-    name: puppetdb
-    max_connections: 60
-    connection_timeout: 3600
+# Directory for puppet code environments (production, development, etc.)
+puppet_server_environment_dir: /etc/puppetlabs/code
+
+# Directory for puppet configuration files
+puppet_server_conf_dir: /etc/puppetlabs/puppet
+
+# PuppetDB configuration
+puppet_server_db:
+  # Database user for PuppetDB connection
+  user: puppetdb
+  # Password for the PuppetDB database user
+  # SECURITY NOTE: Change this in production environments
+  password: puppetdb
+  # Database name for PuppetDB
+  name: puppetdb
+  # Maximum connections to the database
+  max_connections: 60
+  # Database connection timeout in seconds
+  connection_timeout: 3600
+  # Listener configuration for PuppetDB
   listen:
+    # Network address to listen on
+    # Set to 127.0.0.1 for more security in production
     address: "0.0.0.0"
+    # Port for PuppetDB to listen on
     port: 8081

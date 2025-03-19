@@ -1,0 +1,19 @@
+---
+# Service management tasks for Puppet Server role
+
+- name: Enable Puppet Server service
+  ansible.builtin.systemd:
+    name: puppetserver
+    enabled: true
+  tags: [ "service", "puppet_server" ]
+
+- name: Start Puppet Server service
+  ansible.builtin.systemd:
+    name: puppetserver
+    state: started
+  tags: [ "service", "puppet_server" ]
+
+- name: Show Puppet Server status
+  ansible.builtin.debug:
+    msg: "Puppet Server installed and running with certificate name: {{ certname }}"
+  tags: [ "service", "puppet_server" ]

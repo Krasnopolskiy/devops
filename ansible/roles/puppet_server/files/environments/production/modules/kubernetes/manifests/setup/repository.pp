@@ -1,7 +1,7 @@
 # @summary Sets up an APT repository for Kubernetes components
 # @param repo_name Name of the repository
 # @param repo_url URL of the repository
-define kubernetes::setup::repository(
+define kubernetes::setup::repository (
   String $repo_name,
   String $repo_url,
 ) {

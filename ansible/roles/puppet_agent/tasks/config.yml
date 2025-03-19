@@ -1,0 +1,18 @@
+---
+# Configuration tasks for puppet_agent role
+
+- name: Configure Puppet Agent
+  ansible.builtin.template:
+    src: puppet-agent.conf.j2
+    dest: "{{ puppet_agent_conf_dir }}/puppet.conf"
+    mode: "0644"
+  notify: Restart Puppet Agent
+  tags: [ "config", "puppet_agent" ]
+
+- name: Request certificate signing
+  ansible.builtin.command: "/opt/puppetlabs/bin/puppet agent --test --waitforcert {{ puppet_agent_wait_for_cert }}"
+  args:
+    creates: "/etc/puppetlabs/puppet/ssl/certs/{{ certname }}.pem"
+  changed_when: false
+  failed_when: false
+  tags: [ "config", "puppet_agent", "cert" ]

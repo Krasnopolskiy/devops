@@ -1,0 +1,19 @@
+---
+# Service management tasks for puppet_agent role
+
+- name: Enable Puppet agent service
+  ansible.builtin.systemd:
+    name: puppet
+    enabled: true
+  tags: [ "service", "puppet_agent" ]
+
+- name: Start Puppet agent service
+  ansible.builtin.systemd:
+    name: puppet
+    state: started
+  tags: [ "service", "puppet_agent" ]
+
+- name: Show Puppet agent status
+  ansible.builtin.debug:
+    msg: "Puppet Agent installed and configured with certificate name: {{ certname }} connecting to server: {{ server_certname }}"
+  tags: [ "service", "puppet_agent" ]

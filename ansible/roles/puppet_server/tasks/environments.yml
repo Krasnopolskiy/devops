@@ -1,0 +1,18 @@
+---
+# Environment deployment tasks for Puppet Server role
+
+- name: Ensure puppet code directory exists
+  ansible.builtin.file:
+    path: "{{ puppet_server_environment_dir }}"
+    state: directory
+    mode: "0755"
+  tags: [ "environments", "puppet_server" ]
+
+- name: Synchronize Puppet environments with rsync
+  ansible.posix.synchronize:
+    src: environments/
+    dest: "{{ puppet_server_environment_dir }}/environments/"
+    delete: true
+    recursive: true
+  delegate_to: "{{ inventory_hostname }}"
+  tags: [ "environments", "puppet_server" ]

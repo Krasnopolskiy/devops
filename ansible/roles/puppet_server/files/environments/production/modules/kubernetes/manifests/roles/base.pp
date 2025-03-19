@@ -1,3 +1,6 @@
+# @summary Installs and configures Kubernetes components
+# @param kubernetes_version Version of Kubernetes to install
+# @param crio_version Version of CRI-O to install
 class kubernetes::roles::base (
   String $kubernetes_version,
   String $crio_version,
