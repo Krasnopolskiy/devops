@@ -1,4 +1,6 @@
-class kubernetes::worker {
+# @summary Configures a Kubernetes worker node
+# @api private
+class kubernetes::roles::worker {
   $query_result = puppetdb_query("facts { name = 'k8s_join_command' and certname = 'k8s-master.redfield.tech' }")
 
   $join_command = empty($query_result) ? {
@@ -14,9 +16,17 @@ class kubernetes::worker {
 
   exec { 'join-kubernetes-cluster':
     command   => '/bin/bash /tmp/k8s_join_command.sh',
-    path      => ['/usr/sbin', '/usr/bin'],
+    path      => ['/usr/sbin', '/usr/bin', '/bin'],
     creates   => '/etc/kubernetes/kubelet.conf',
-    require   => File['/tmp/k8s_join_command.sh'],
+    require   => [
+      File['/tmp/k8s_join_command.sh'],
+      Service['crio'],
+      Exec['swapoff'],
+      Kubernetes::Config::Sysctl['kubernetes-network-settings'],
+    ],
+    tries     => 3,
+    try_sleep => 30,
+    timeout   => 600,
     logoutput => true,
   }
 }

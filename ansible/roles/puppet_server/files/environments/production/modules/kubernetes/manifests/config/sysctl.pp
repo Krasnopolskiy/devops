@@ -1,4 +1,7 @@
-define kubernetes::sysctl_config(
+# @summary Configures system control (sysctl) parameters
+# @param filename Name of the sysctl configuration file to create
+# @param settings Hash of sysctl settings to configure
+define kubernetes::config::sysctl(
   String $filename,
   Hash $settings,
 ) {
@@ -11,8 +14,10 @@ define kubernetes::sysctl_config(
   }
 
   exec { "apply-sysctl-${filename}":
-    command     => '/sbin/sysctl --system',
+    command     => 'sysctl --system',
+    path        => ['/sbin', '/usr/sbin'],
     refreshonly => true,
     subscribe   => File["/etc/sysctl.d/${filename}"],
+    logoutput   => true,
   }
 }
