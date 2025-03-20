@@ -1,0 +1,25 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: [ "node", ".next/standalone/server.js" ]
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ./config/.env
+
+  postgres:
+    image: postgres:15.4-alpine
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+    env_file:
+      - ./config/.env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
