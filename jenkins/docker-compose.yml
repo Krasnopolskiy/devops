@@ -1,0 +1,42 @@
+services:
+  controller:
+    hostname: controller.local
+    build:
+      context: controller
+      dockerfile: Dockerfile
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - controller_data:/var/jenkins_home
+      - ./controller/jobs:/var/jenkins/jobs
+      - ./controller/keys:/var/jenkins/keys
+      - ./controller/jenkins.yaml:/var/jenkins/jenkins.yaml
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - CASC_JENKINS_CONFIG=/var/jenkins/jenkins.yaml
+    networks:
+      - internal
+      - devops
+
+  agent:
+    hostname: agent.local
+    build:
+      context: agent
+      dockerfile: Dockerfile
+    volumes:
+      - agent_data:/home/jenkins/agent
+    env_file:
+      - ./agent/.env
+    networks:
+      - internal
+      - devops
+    privileged: true
+
+volumes:
+  controller_data:
+  agent_data:
+
+networks:
+  internal:
+  devops:
+    external: true

@@ -15,7 +15,7 @@ services:
   postgres:
     image: postgres:15.4-alpine
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     env_file:
       - ./config/.env
     healthcheck:
@@ -23,3 +23,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+volumes:
+  postgres_data:

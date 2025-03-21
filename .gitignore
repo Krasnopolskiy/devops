@@ -9,9 +9,9 @@
 # User-specific stuff
 .idea/
 data/
-certs/
-env/
-config/
+.env
+harbor/
+*.key
 
 # CMake
 cmake-build-*/

@@ -1,0 +1,39 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+
+      - basicSSHUserPrivateKey:
+          id: "agent-ssh"
+          privateKeySource:
+            directEntry:
+              privateKey: "${readFile:/var/jenkins/keys/agent.key}"
+          scope: GLOBAL
+          username: "jenkins"
+
+      - usernamePassword:
+          description: "Harbor registry credentials"
+          id: "harbor"
+          password: "${readFile:/var/jenkins/keys/harbor.key}"
+          scope: GLOBAL
+          username: "admin"
+
+jobs:
+  - file: /var/jenkins/jobs/todo.groovy
+
+jenkins:
+  nodes:
+
+  - permanent:
+      labelString: "shared"
+      launcher:
+        ssh:
+          credentialsId: "agent-ssh"
+          host: "agent.local"
+          port: 22
+          sshHostKeyVerificationStrategy: "nonVerifyingKeyVerificationStrategy"
+      name: "Jenkins Agent SSH"
+      remoteFS: "/home/jenkins"
+      retentionStrategy: "always"
+
+  numExecutors: 0

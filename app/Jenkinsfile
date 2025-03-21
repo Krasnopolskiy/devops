@@ -1,0 +1,106 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'harbor.local'
+        DOCKER_CREDENTIALS = credentials('harbor')
+        DOCKER_NETWORK = "jenkins-ci"
+
+        APP_IMAGE_CI = "${DOCKER_REGISTRY}/library/todo-ci:latest"
+        APP_IMAGE = "${DOCKER_REGISTRY}/library/todo:latest"
+
+        POSTGRES_IMAGE = 'postgres:15.4-alpine'
+        POSTGRES_USER = 'todo'
+        POSTGRES_PASSWORD = 'postgres'
+        POSTGRES_DB = 'todo'
+        DATABASE_URL = "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Run Linter') {
+            agent {
+                docker {
+                    image "${APP_IMAGE_CI}"
+                    reuseNode true
+                }
+            }
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh 'npm run lint > linter.txt'
+                }
+                archiveArtifacts artifacts: 'linter.txt', allowEmptyArchive: true
+            }
+        }
+
+        stage('Create Docker Network') {
+            steps {
+                sh "docker network create ${DOCKER_NETWORK}"
+            }
+        }
+
+        stage('Start Test Database') {
+            steps {
+                sh '''
+                    docker run -d --name postgres -p 5432:5432 \
+                        --network ${DOCKER_NETWORK} \
+                        -e POSTGRES_USER=${POSTGRES_USER} \
+                        -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+                        -e POSTGRES_DB=${POSTGRES_DB} \
+                        ${POSTGRES_IMAGE}
+                '''
+            }
+        }
+
+        stage('Run Tests') {
+            agent {
+                docker {
+                    image "${APP_IMAGE_CI}"
+                    reuseNode true
+                    args "--network ${DOCKER_NETWORK}"
+                }
+            }
+            steps {
+                sh 'npm run migrate deploy'
+                sh 'npm run test -- --json --outputFile=tests.json || true'
+                sh 'npm run test -- --reporters=default --testResultsProcessor=jest-junit'
+                archiveArtifacts artifacts: 'tests.json', allowEmptyArchive: true
+                junit 'junit.xml'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'echo $DOCKER_CREDENTIALS_PSW | docker login $DOCKER_REGISTRY -u $DOCKER_CREDENTIALS_USR --password-stdin'
+                sh 'NODE_ENV=production docker build -t ${APP_IMAGE} -f Dockerfile .'
+                sh 'docker push ${APP_IMAGE}'
+            }
+        }
+    }
+
+    post {
+        always {
+            sh 'docker rm -f postgres || true'
+            sh 'docker network rm ${DOCKER_NETWORK} || true'
+
+            script {
+                sh '''
+                    echo "Build Summary" > summary.txt
+                    echo "=============" >> summary.txt
+                    echo "Build ID: ${BUILD_ID}" >> summary.txt
+                    echo "Job Name: ${JOB_NAME}" >> summary.txt
+                    echo "Build URL: ${BUILD_URL}" >> summary.txt
+                    echo "Build Time: $(date)" >> summary.txt
+                    echo "" >> summary.txt
+                    echo "Docker Image: ${APP_IMAGE}" >> summary.txt
+                '''
+                archiveArtifacts artifacts: 'summary.txt', allowEmptyArchive: true
+            }
+        }
+    }
+}
