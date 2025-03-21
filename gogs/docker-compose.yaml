@@ -1,19 +1,32 @@
 ---
 services:
   gogs:
+    hostname: gogs.local
     image: gogs/gogs:0.13-arm64
     ports:
       - "127.0.0.1:3000:3000"
-      - "127.0.0.1:2222:2222"
+      - "2211:2211"
     volumes:
-      - ./data/gogs:/data
-      - type: bind
-        source: ./common/config/gogs/app.ini
-        target: /data/gogs/conf/app.ini
+      - ./config/app.ini:/data/gogs/conf/app.ini
+      - gogs-data:/data
+    networks:
+      - devops
+      - internal
 
   postgresql:
     image: postgres:17-alpine
     env_file:
-      - ./common/config/db/env
+      - ./config/.env
     volumes:
-      - ./data/postgresql:/var/lib/postgresql/data
+      - postgresql-data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+volumes:
+  gogs-data:
+  postgresql-data:
+
+networks:
+  internal:
+  devops:
+    external: true

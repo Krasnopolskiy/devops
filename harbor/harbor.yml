@@ -6,8 +6,8 @@ http:
 
 https:
   port: 443
-  certificate: /Users/ivan/PycharmProjects/mephi/orchestration/harbor/certs/harbor.local/harbor.local.cert
-  private_key: /Users/ivan/PycharmProjects/mephi/orchestration/harbor/certs/harbor.local/harbor.local.key
+  certificate: /Users/ivan/PycharmProjects/mephi/devops/harbor/certs/harbor.local.crt
+  private_key: /Users/ivan/PycharmProjects/mephi/devops/harbor/certs/harbor.local.key
 
 harbor_admin_password: admin
 
