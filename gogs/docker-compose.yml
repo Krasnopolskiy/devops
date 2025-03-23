@@ -8,7 +8,7 @@ services:
       - "2211:2211"
     volumes:
       - ./config/app.ini:/data/gogs/conf/app.ini
-      - gogs-data:/data
+      - gogs_data:/data
     networks:
       - devops
       - internal
@@ -18,13 +18,13 @@ services:
     env_file:
       - ./config/.env
     volumes:
-      - postgresql-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - internal
 
 volumes:
-  gogs-data:
-  postgresql-data:
+  gogs_data:
+  postgres_data:
 
 networks:
   internal:

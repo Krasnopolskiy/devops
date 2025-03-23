@@ -1,5 +1,0 @@
-Dockerfile
-docker-compose.yml
-data/
-node_modules/
-.next/
