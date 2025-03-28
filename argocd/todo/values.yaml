@@ -1,0 +1,11 @@
+namespace: argocd
+
+gogs:
+  name: gogs-git-server
+  ip: 10.0.10.1
+
+application:
+  name: todo-application
+  repoURL: http://gogs-git-server:3000/owner/todo.git
+  targetRevision: main
+  path: helm

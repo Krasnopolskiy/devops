@@ -4,7 +4,7 @@ services:
     hostname: gogs.local
     image: gogs/gogs:0.13-arm64
     ports:
-      - "127.0.0.1:3000:3000"
+      - "0.0.0.0:3000:3000"
       - "2211:2211"
     volumes:
       - ./config/app.ini:/data/gogs/conf/app.ini
