@@ -1,0 +1,10 @@
+---
+# Main tasks file for node_exporter role
+
+- name: Import setup tasks
+  ansible.builtin.import_tasks: setup.yml
+  tags: [ "setup", "node_exporter" ]
+
+- name: Import install tasks
+  ansible.builtin.import_tasks: install.yml
+  tags: [ "install", "node_exporter" ]
