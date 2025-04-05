@@ -1,0 +1,19 @@
+singleNode: true
+
+resources:
+  requests:
+    cpu: "0.1"
+    memory: "128Mi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+
+persistence:
+  enabled: true
+  storageClass: "local-storage"
+  accessModes: ["ReadWriteOnce"]
+  size: "10Gi"
+
+extraEnvs:
+  - name: OPENSEARCH_INITIAL_ADMIN_PASSWORD
+    value: Folded-Kings-093

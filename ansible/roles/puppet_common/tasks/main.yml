@@ -1,6 +1,10 @@
 ---
 # Main tasks file for puppet_common role
 
+- name: Import common hosts tasks
+  ansible.builtin.import_tasks: hosts.yml
+  tags: [ "hosts", "puppet_common" ]
+
 - name: Import common installation tasks
   ansible.builtin.import_tasks: install.yml
   tags: [ "install", "puppet_common" ]

@@ -1,13 +1,11 @@
 apiVersion: v1
 kind: Endpoints
 metadata:
-  name: {{ .Values.gogs.name }}
+  name: {{ .Values.prepper.name }}
   namespace: {{ .Values.namespace }}
 subsets:
   - addresses:
-    - ip: {{ .Values.gogs.ip }}
+    - ip: {{ .Values.prepper.ip }}
     ports:
     - name: http
-      port: 3000
-    - name: ssh
-      port: 2211
+      port: 2021

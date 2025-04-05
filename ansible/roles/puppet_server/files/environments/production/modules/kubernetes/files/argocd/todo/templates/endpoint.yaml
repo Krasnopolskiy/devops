@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: {{ .Values.gogs.name }}
+  namespace: {{ .Values.namespace }}
+subsets:
+  - addresses:
+    - ip: {{ .Values.gogs.ip }}
+    ports:
+    - name: http
+      port: 3000
+    - name: ssh
+      port: 2211

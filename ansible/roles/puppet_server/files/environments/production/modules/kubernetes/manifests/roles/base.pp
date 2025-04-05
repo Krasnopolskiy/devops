@@ -39,6 +39,11 @@ class kubernetes::roles::base (
     mode   => '0755',
   }
 
+  file { '/etc/k8s':
+    ensure => directory,
+    mode   => '0755',
+  }
+
   kubernetes::setup::repository { 'kubernetes':
     repo_name => 'kubernetes',
     repo_url  => "https://pkgs.k8s.io/core:/stable:/${kubernetes_version}/deb/",

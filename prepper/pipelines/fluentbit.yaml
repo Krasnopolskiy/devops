@@ -1,0 +1,23 @@
+fluentbit:
+  workers: 4
+  delay: 3000
+  source:
+    http:
+      path: "/"
+      port: 2021
+  processor:
+    - grok:
+        match:
+          message: [ "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} %{GREEDYDATA:message}" ]
+        break_on_match: true
+    - date:
+        from_time_received: true
+        destination: "@timestamp"
+
+  sink:
+    - opensearch:
+        hosts: ["https://host.docker.internal:9200"]
+        index: "logs-%{+yyyy.MM.dd}"
+        username: "admin"
+        password: "Folded-Kings-093"
+        insecure: true

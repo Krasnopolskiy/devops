@@ -6,3 +6,5 @@ puppet_common_version: 8
 
 # Ubuntu release codename (focal = 20.04, jammy = 22.04)
 puppet_common_ubuntu_release: "{{ ansible_distribution_release }}"
+
+puppet_common_gateway_services: "gogs.local harbor.local jenkins.local"

@@ -8,18 +8,24 @@ class kubernetes::roles::worker {
     default => $query_result[0]['value'],
   }
 
-  file { '/tmp/k8s_join_command.sh':
+  file { '/mnt/k8s':
+    ensure => directory,
+    mode   => '0777',
+  }
+
+  file { '/etc/k8s/join_command.sh':
     ensure  => present,
     content => $join_command,
     mode    => '0700',
+    require => File['/etc/k8s'],
   }
 
   exec { 'join-kubernetes-cluster':
-    command   => '/bin/bash /tmp/k8s_join_command.sh',
+    command   => '/bin/bash /etc/k8s/join_command.sh',
     path      => ['/usr/sbin', '/usr/bin', '/bin'],
     creates   => '/etc/kubernetes/kubelet.conf',
     require   => [
-      File['/tmp/k8s_join_command.sh'],
+      File['/etc/k8s/join_command.sh'],
       Service['crio'],
       Exec['swapoff'],
       Kubernetes::Config::Sysctl['kubernetes-network-settings'],

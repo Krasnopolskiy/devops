@@ -3,7 +3,12 @@
 class kubernetes::roles::master (
   String $pod_network_cidr = $kubernetes::pod_network_cidr,
 ) {
+  include kubernetes::setup::helm
   include kubernetes::setup::dashboard
+  include kubernetes::setup::argocd
+  include kubernetes::setup::opensearch
+  include kubernetes::setup::prepper
+  include kubernetes::setup::fluentbit
 
   exec { 'kubeadm-init':
     command   => "kubeadm init --v=5 --pod-network-cidr=${pod_network_cidr}",
@@ -41,14 +46,23 @@ class kubernetes::roles::master (
     recurse => true,
   }
 
-  file { '/tmp/kube-flannel.yml':
+  file { '/etc/k8s/flannel':
+    ensure  => directory,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    recurse => true,
+    require => File['/etc/k8s'],
+  }
+
+  file { '/etc/k8s/flannel/kube-flannel.yml':
     ensure => file,
-    source => 'puppet:///modules/kubernetes/kube-flannel.yml',
+    source => 'puppet:///modules/kubernetes/flannel/kube-flannel.yml',
     before => Exec['deploy-flannel'],
   }
 
   exec { 'deploy-flannel':
-    command   => 'kubectl apply -f /tmp/kube-flannel.yml',
+    command   => 'kubectl apply -f /etc/k8s/flannel/kube-flannel.yml',
     path      => ['/usr/bin', '/bin'],
     require   => File['/root/.kube/config'],
     unless    => 'kubectl get daemonset -n kube-flannel | grep flannel',

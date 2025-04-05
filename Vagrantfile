@@ -1,23 +1,27 @@
 $host = "redfield.tech"
 $image = "bento/ubuntu-20.04"
-$ram = 2048
-$cpu = 2
 
 machines = {
   :provisioner => {
     :hostname => "provisioner",
     :ip => "10.0.10.2",
-    :role => "puppet_server"
+    :role => "puppet_server",
+    :cpu => 2,
+    :ram => 2048,
   },
   :master => {
     :hostname => "k8s-master",
     :ip => "10.0.10.3",
-    :role => "puppet_agent"
+    :role => "puppet_agent",
+    :cpu => 2,
+    :ram => 2048,
   },
   :worker => {
     :hostname => "k8s-worker",
     :ip => "10.0.10.4",
-    :role => "puppet_agent"
+    :role => "puppet_agent",
+    :cpu => 8,
+    :ram => 8096,
   }
 }
 
@@ -25,8 +29,8 @@ def setup_node(node, machine)
   node.vm.hostname = machine[:hostname]
   node.vm.network "private_network", ip: machine[:ip]
   node.vm.provider "vmware_desktop" do |vm|
-    vm.memory = $ram
-    vm.cpus = $cpu
+    vm.memory = machine[:ram]
+    vm.cpus = machine[:cpu]
   end
 end
 
@@ -36,6 +40,7 @@ def provision_ansible(node, machine, server)
   extra_vars = {
     "puppet_password" => ENV['PUPPET_API_KEY'],
     "server_ip" => server[:ip],
+    "gateway_ip" => "10.0.10.1",
     "certname" => "#{machine[:hostname]}.#{$host}"
   }
 

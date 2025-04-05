@@ -1,9 +1,9 @@
 ---
 # Main tasks file for puppet_agent role
 
-- name: Import verification tasks
-  ansible.builtin.import_tasks: verify.yml
-  tags: [ "verify", "puppet_agent" ]
+- name: Import hosts tasks
+  ansible.builtin.import_tasks: hosts.yml
+  tags: [ "hosts", "puppet_agent" ]
 
 - name: Import installation tasks
   ansible.builtin.import_tasks: install.yml

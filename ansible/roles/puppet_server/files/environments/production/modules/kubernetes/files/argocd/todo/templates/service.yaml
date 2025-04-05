@@ -5,9 +5,10 @@ metadata:
   namespace: {{ .Values.namespace }}
 spec:
   ports:
-  - port: 3000
+  - name: http
+    port: 3000
     targetPort: 3000
-    name: http
-  - port: 2211
+  - name: ssh
+    port: 2211
     targetPort: 2211
-    name: ssh
+  type: ClusterIP
