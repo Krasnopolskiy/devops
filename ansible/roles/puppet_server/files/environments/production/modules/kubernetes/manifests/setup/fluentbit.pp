@@ -17,25 +17,10 @@ class kubernetes::setup::fluentbit {
     logoutput   => true,
   }
 
-  file { '/etc/k8s/fluentbit':
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    recurse => true,
-    require => File['/etc/k8s'],
-  }
-
-  file { '/etc/k8s/fluentbit/values.yaml':
-    ensure  => file,
-    source  => 'puppet:///modules/kubernetes/logging/fluentbit/values.yaml',
-    require => File['/etc/k8s/fluentbit'],
-  }
-
   exec { 'install-fluentbit':
     command     => 'helm upgrade --install -n logging fluent-bit fluent/fluent-bit -f /etc/k8s/fluentbit/values.yaml',
     path        => ['/usr/bin', '/usr/local/bin'],
-    require     => [Exec['create_join_command_fact'], Exec['create-fluentbit-namespace'], File['/etc/k8s/fluentbit/values.yaml']],
+    require     => [Exec['create-join-command-fact'], Exec['create-fluentbit-namespace'], File['/etc/k8s']],
     logoutput   => true,
   }
 }

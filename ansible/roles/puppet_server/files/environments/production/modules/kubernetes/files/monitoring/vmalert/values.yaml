@@ -1,0 +1,56 @@
+server:
+  replicaCount: 1
+  datasource:
+    url: "http://vmcluster-victoria-metrics-cluster-vmselect.monitoring.svc.cluster.local:8481/select/0/prometheus/"
+
+  remote:
+    write:
+      url: "http://vmcluster-victoria-metrics-cluster-vminsert.monitoring.svc.cluster.local:8480/insert/0/prometheus/"
+    read:
+      url: "http://vmcluster-victoria-metrics-cluster-vmselect.monitoring.svc.cluster.local:8481/select/0/prometheus/"
+
+  notifier:
+    alertmanager:
+      url: "http://vmalert-victoria-metrics-alert-alertmanager.monitoring.svc.cluster.local:9093"
+
+  config:
+    alerts:
+      groups:
+      - name: node-exporter-alerts
+        interval: 30s
+        rules:
+        - alert: NodeExporterDown
+          expr: up{job="node-exporter"} == 0
+          for: 30s
+          labels:
+            severity: critical
+            category: node
+          annotations:
+            summary: "{{ $labels.instance }} is down"
+            description: "{{ $labels.instance }} has been down for more than 30 seconds."
+
+alertmanager:
+  enabled: true
+  config:
+    global:
+      resolve_timeout: 1m
+
+    route:
+      receiver: telegram
+      group_by: [ alertname ]
+
+    receivers:
+      - name: telegram
+        telegram_configs:
+          - bot_token: "7540381310:AAGgiWylFrV2Nxlk0cSZgaGSPcbHm5pm3ME"
+            chat_id: -1002632176588
+            api_url: https://api.telegram.org
+            parse_mode: HTML
+            message: |
+              {{ range .Alerts }}
+              <b>🚨 Alert [<code>{{ .Labels.severity }}</code>] 🚨</b>
+
+              <b>{{ .Annotations.summary }}</b>
+
+              {{ .Annotations.description }}
+              {{ end }}

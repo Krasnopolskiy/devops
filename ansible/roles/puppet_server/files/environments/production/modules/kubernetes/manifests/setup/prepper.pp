@@ -8,18 +8,10 @@ class kubernetes::setup::prepper {
     logoutput   => true,
   }
 
-  file { '/etc/k8s/prepper':
-    ensure  => directory,
-    source  => 'puppet:///modules/kubernetes/logging/prepper',
-    require => File['/etc/k8s'],
-    recurse => true,
-    replace => true,
-  }
-
   exec { 'install-prepper':
     command     => 'helm upgrade --install -n logging prepper /etc/k8s/prepper',
     path        => ['/usr/bin', '/usr/local/bin'],
-    require     => [Exec['create_join_command_fact'], File['/etc/k8s/prepper']],
+    require     => [Exec['create-join-command-fact'], File['/etc/k8s']],
     logoutput   => true,
   }
 }

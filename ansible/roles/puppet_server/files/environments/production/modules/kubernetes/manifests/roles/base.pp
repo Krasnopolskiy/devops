@@ -40,8 +40,10 @@ class kubernetes::roles::base (
   }
 
   file { '/etc/k8s':
-    ensure => directory,
+    ensure  => directory,
+    recurse => true,
     mode   => '0755',
+    source  => 'puppet:///modules/kubernetes/',
   }
 
   kubernetes::setup::repository { 'kubernetes':

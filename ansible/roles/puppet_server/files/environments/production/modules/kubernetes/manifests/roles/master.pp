@@ -9,6 +9,7 @@ class kubernetes::roles::master (
   include kubernetes::setup::opensearch
   include kubernetes::setup::prepper
   include kubernetes::setup::fluentbit
+  include kubernetes::setup::monitoring
 
   exec { 'kubeadm-init':
     command   => "kubeadm init --v=5 --pod-network-cidr=${pod_network_cidr}",
@@ -46,25 +47,10 @@ class kubernetes::roles::master (
     recurse => true,
   }
 
-  file { '/etc/k8s/flannel':
-    ensure  => directory,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    recurse => true,
-    require => File['/etc/k8s'],
-  }
-
-  file { '/etc/k8s/flannel/kube-flannel.yml':
-    ensure => file,
-    source => 'puppet:///modules/kubernetes/flannel/kube-flannel.yml',
-    before => Exec['deploy-flannel'],
-  }
-
   exec { 'deploy-flannel':
     command   => 'kubectl apply -f /etc/k8s/flannel/kube-flannel.yml',
     path      => ['/usr/bin', '/bin'],
-    require   => File['/root/.kube/config'],
+    require   => [File['/root/.kube/config'], File['/etc/k8s']],
     unless    => 'kubectl get daemonset -n kube-flannel | grep flannel',
     tries     => 3,
     try_sleep => 30,
@@ -80,7 +66,7 @@ class kubernetes::roles::master (
     recurse => true,
   }
 
-  exec { 'create_join_command_fact':
+  exec { 'create-join-command-fact':
     command   => "echo k8s_join_command=$(kubeadm token create --print-join-command) > /etc/facter/facts.d/k8s_join_command.txt",
     path      => ['/usr/bin', '/bin'],
     creates   => '/etc/facter/facts.d/k8s_join_command.txt',

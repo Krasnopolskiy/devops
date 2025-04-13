@@ -14,5 +14,6 @@
         msg: "Puppet password is not defined. Please define it by running: export PUPPET_API_KEY=your_password"
 
   roles:
+    - node_exporter
     - puppet_common
     - puppet_agent

@@ -5,14 +5,14 @@ class kubernetes::setup::argocd {
     command     => 'kubectl create namespace argocd',
     path        => ['/usr/bin', '/bin'],
     unless      => 'kubectl get namespace argocd',
-    require     => [Exec['create_join_command_fact'], Exec['deploy-flannel']],
+    require     => [Exec['create-join-command-fact'], Exec['deploy-flannel']],
     logoutput   => true,
   }
 
   exec { 'install-argocd':
     command     => 'kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml',
     path        => ['/usr/bin', '/bin'],
-    require     => [Exec['create_join_command_fact'], Exec['create-argocd-namespace']],
+    require     => [Exec['create-join-command-fact'], Exec['create-argocd-namespace']],
     logoutput   => true,
   }
 

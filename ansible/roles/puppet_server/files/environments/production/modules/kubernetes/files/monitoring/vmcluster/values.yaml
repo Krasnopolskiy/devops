@@ -1,0 +1,11 @@
+vminsert:
+  replicaCount: 1
+
+vmselect:
+  replicaCount: 1
+
+vmstorage:
+  replicaCount: 1
+  retentionPeriod: 14d
+  persistentVolume:
+    storageClassName: "local-storage"
